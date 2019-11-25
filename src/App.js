@@ -15,7 +15,6 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <Header />
         <NavOptions />
         <Suspense fallback={<div>Loading...</div>}>
           <Route exact path="/" component={ListPage} />
@@ -23,7 +22,6 @@ class App extends React.Component {
           <Route path="/pages/editpage/:id" component={EditPage} />
           <Route path="/pages/viewitem/:id" component={ViewItemPage} />
         </Suspense>
-        <Footer />
       </div>
     );
   }

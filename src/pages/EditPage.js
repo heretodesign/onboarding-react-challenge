@@ -2,26 +2,52 @@ import React from 'react'
 import axios from 'axios'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 
+const baseURL = "https://on5os8gmcj.execute-api.ap-southeast-1.amazonaws.com/stage/v1/projects"
+
 class EditPage extends React.Component {
-  state = {
-    id: '',
-    title: '',
-    status: '',
-    "project description": '',
-    company_id: '',
-    company_type: '',
-    start_date: '',
-    project_manager_id: '',
-    project_manager_type: '',
-    end_date: '',
-    type: '',
-    priority: ''
+  constructor(props) {
+    super(props);
+     this.title = React.createRef();
+    this.state = {
+      id: '',
+      title: '',
+      status: '',
+      description: '',
+      company_id: '',
+      company_type: '',
+      start_date: '',
+      project_manager_id: '',
+      project_manager_type: '',
+      end_date: '',
+      type: '',
+      priority: ''
+    }
   }
 
+  componentDidMount () {
+    this.getProjectDetails();
+  }
+
+  getProjectDetails() {
+    let projectId = this.props.match.params.id;
+    axios.get(`https://on5os8gmcj.execute-api.ap-southeast-1.amazonaws.com/stage/v1/projects/${projectId}`)
+    .then(result => {
+      console.log(result.data.attributes.title);
+      this.title = result.data.attributes.title;
+      console.log(this.title)
+      this.setState({
+        data: result.data,
+        isLoading: false,
+      })
+    }).catch(e => {
+      console.log(e);
+    })
+  }
+  
   handleChange = event => {
     // console.log([event.target.name],[event.target.value]);
     this.setState({
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value
     });
   }
   onChange(e) {
@@ -30,8 +56,6 @@ class EditPage extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault()
-    const url = "https://on5os8gmcj.execute-api.ap-southeast-1.amazonaws.com/stage/v1/projects"
-
     const data = {
        "id": this.state.id,
        "type":"projects",
@@ -60,7 +84,7 @@ class EditPage extends React.Component {
        }
      }
     console.log({data});
-    axios.patch(url+this.props.match.params.id,data)
+    axios.patch(baseURL+this.props.match.params.id,data)
       .then(response => {
         console.log(response.data)
         console.log('Item successfully updated')
@@ -87,6 +111,7 @@ class EditPage extends React.Component {
 
 
   render(){
+    const {isLoading, data } = this.state;
     return (
       <>
        <section className="section is-paddingless-horizontal">
@@ -101,30 +126,14 @@ class EditPage extends React.Component {
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" value={this.state.id} placeholder="Add ID" value={this.state.id} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="id" value={this.state.id} placeholder="Add ID" ref="id" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" placeholder="Add Title" value={this.state.title} onChange={this.handleChange} />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="columns">
-                          <div className="column">
-                            <div className="field">
-                              <div className="control">
-                                <input className="input is-medium" type="text" name="status" value={this.state.status} placeholder="Add Status" value={this.state.status} onChange={this.handleChange} />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="column">
-                            <div className="field">
-                              <div className="control">
-                                <input className="input is-medium" type="text" name="project description" value={this.state["project description"]} placeholder="Add Project Description" value={this.state["project description"]} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="title"  placeholder="Add Title" value={this.state.title} ref="title"  onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
@@ -133,14 +142,14 @@ class EditPage extends React.Component {
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" name="start_date" value={this.state.start_date} placeholder="Add Start Date" value={this.state.start_date} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="status" value={this.state.status} ref="status" value={this.state.status} onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                              <input className="input is-medium" type="text" name="end_date" value={this.state.end_date} placeholder="Add End Date" value={this.state.end_date} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="project description" value={this.state["project description"]} ref="project description" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
@@ -149,14 +158,30 @@ class EditPage extends React.Component {
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" name="priority" value={this.state.priority} placeholder="Add Priority Level" value={this.state.priority} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="start_date" value={this.state.start_date} ref="start_date" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" name="type" value={this.state.type} placeholder="Add Type" value={this.state.type} onChange={this.handleChange} />
+                              <input className="input is-medium" type="text" name="end_date" value={this.state.end_date} ref="end_date" onChange={this.handleChange} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="columns">
+                          <div className="column">
+                            <div className="field">
+                              <div className="control">
+                                <input className="input is-medium" type="text" name="priority" value={this.state.priority} ref="priority" onChange={this.handleChange} />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="column">
+                            <div className="field">
+                              <div className="control">
+                                <input className="input is-medium" type="text" name="type" value={this.state.type} ref="type" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
@@ -169,14 +194,14 @@ class EditPage extends React.Component {
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" name="project_manager_id" value={this.state.project_manager_id} placeholder="Add Project Manager Id" value={this.state.project_manager_id} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="project_manager_id" value={this.state.project_manager_id} ref="project_manager_id" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                              <input className="input is-medium" type="text" name="project_manager_type" value={this.state.project_manager_type} placeholder="Add Project Manager Type" value={this.state.project_manager_type} onChange={this.handleChange} />
+                              <input className="input is-medium" type="text" name="project_manager_type" value={this.state.project_manager_type} ref="project_manager_type" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
@@ -189,14 +214,14 @@ class EditPage extends React.Component {
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" name="company_id" value={this.state.company_id} placeholder="Add Company ID" value={this.state.company_id} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="company_id" value={this.state.company_id} ref="company_id" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>
                           <div className="column">
                             <div className="field">
                               <div className="control">
-                                <input className="input is-medium" type="text" name="company_type" value={this.state.company_type} placeholder="Add Company Type" value={this.state.company_type} onChange={this.handleChange} />
+                                <input className="input is-medium" type="text" name="company_type" value={this.state.company_type} ref="company_type" onChange={this.handleChange} />
                               </div>
                             </div>
                           </div>

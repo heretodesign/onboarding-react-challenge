@@ -1,24 +1,33 @@
-
 import React from 'react'
 import axios from 'axios'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 
 class ListPage extends React.Component {
-  state = {
-    projects: [],
+  constructor(props) {
+    super(props);
+    this.state = {
+      projects: [],
+      searchInput: '',
+      filterData: []
+    }
   }
 
   componentDidMount () {
     axios.get('https://on5os8gmcj.execute-api.ap-southeast-1.amazonaws.com/stage/v1/projects')
     .then(response => {
-      console.log(response.data);
-
+      console.log(response.data[0].relationships["project-manager"].data.id);
       this.setState({
         projects: response.data
       })
     })
     .catch(error => {
       console.log('ERROR: ', error)
+    })
+  }
+
+  handleChange = (e) => {
+    this.setState({
+      searchInput: e.target.value
     })
   }
 
@@ -31,13 +40,54 @@ class ListPage extends React.Component {
   }
 
   render() {
-
+    const { projects, searchInput } = this.state;
+    // const filteredPM = projects.relationships["project-manager"].data.id.filter(pm => {
+    //   return pm.project.relationships["project-manager"].data.id.toLowerCase().indexOf(searchInput.toLowerCase()) !== -1
+    // })
+    const filteredPM = projects.filter(project => {
+      console.log('abel' + projects);
+      
+      // return project.relationships["project-managers"].data.id === searchInput;
+    })
       return (
         <div>
           <section className="section is-paddingless-horizontal">
               <div className="container grid is-large notification">
                   <div className="firstsection">
                       <h1 className="title is-3">Att: list of all Projects</h1>
+                      <div class="columns is-mobile">
+                        <div class="column is-5 is-offset-7">
+                          <div className="content">
+                            <form id="addName-form" onSubmit={e => this.searchFilter(e)}>
+                              <div className="columns" id="mainColumns">
+                                <div className="column " id="mainCol">
+                                  <div className="field">
+                                    <div className="control">
+                                      <input
+                                        onChange={e => this.handleChange(e)}
+                                        className="input is-info is-medium"
+                                        type="text"
+                                        name="searchInput"
+                                        value={this.state.searchInput || ""}
+                                        placeholder="..search by PM" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="columns">
+                                <div className="column is-three-fifths is-offset-one-fifth">
+                                  {
+                                      filteredPM.map((item, index) =>
+                                        <div className="is-size-5 has-text-left" id="empDiv" key={index}>
+                                          {item.id} - {item.id_type} {item.attributes.status} {item.relationships["project-manager"].data.id}
+                                        </div>)
+                                    }
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
                       <div className="content">
                         <div className="columns">
                           <div className="column" id="tablelisttask">
@@ -60,7 +110,7 @@ class ListPage extends React.Component {
                                 </tr>
                               </thead>
                               <tbody>
-                                {this.state.projects.map((project) => (
+                                {projects.map((project) => (
                                   <tr className="key={project.id}">
                                     <td>{ project.id }</td>
                                     <td>{ project.attributes.title }</td>
@@ -70,8 +120,8 @@ class ListPage extends React.Component {
                                     <td>{ project.attributes.priority }</td>
                                     <td>{ project.attributes.start_date }</td>
                                     <td>{ project.attributes.end_date }</td>
-                                    <td>{ project.relationships.company.data.id }</td>
-                                    <td>{ project.relationships.company.data.type }</td>
+                                    <td>{ project.relationships["project-manager"].data.id }</td>
+                                    <td>{ project.relationships["project-manager"].data.type }</td>
                                     <td>{ project.id }</td>
                                     <td>{ project.type }</td>
                                     <td>
